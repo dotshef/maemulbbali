@@ -145,14 +145,11 @@ export default function Home() {
             {loading ? "조회 중..." : "조회"}
           </Button>
         </div>
-      </div>
-
-      {/* 에러 */}
-      {error && (
-        <div className="w-full max-w-5xl mx-auto mt-4">
+        {/* 에러 */}
+        {error && (
           <p className="text-base text-destructive">{error}</p>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* 결과 */}
       {areaResult && (

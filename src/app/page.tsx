@@ -108,37 +108,35 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col px-4 py-6">
       {/* 검색 폼 */}
-      <div className="w-full max-w-5xl mx-auto">
-        <div className="flex gap-2 items-end">
-          <div className="flex-1 flex gap-2">
-            <div className="flex-1">
-              <Label className="text-base mb-1 block">주소</Label>
-              <div className="flex gap-2">
-                <div className="flex-1 rounded-md border bg-muted px-3 py-2 text-base min-h-10">
-                  {address ? (
-                    <p>
-                      {address.jibunAddress}
-                      {address.buildingName && ` (${address.buildingName})`}
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground">주소를 검색해주세요</p>
-                  )}
-                </div>
-                <Button onClick={handleSearch} className="text-base shrink-0 cursor-pointer rounded-md h-auto">
-                  검색
-                </Button>
-              </div>
+      <div className="w-full max-w-2xl mx-auto rounded-lg border bg-card p-6 space-y-4">
+        <div>
+          <Label className="text-lg font-semibold mb-1 block">주소</Label>
+          <div className="flex gap-2">
+            <div className="flex-1 rounded-md border bg-muted px-3 py-2 text-base min-h-10">
+              {address ? (
+                <p>
+                  {address.jibunAddress}
+                  {address.buildingName && ` (${address.buildingName})`}
+                </p>
+              ) : (
+                <p className="text-muted-foreground">주소를 검색해주세요</p>
+              )}
             </div>
-            <div className="w-48">
-              <Label className="text-base mb-1 block">상세주소</Label>
-              <Input
-                placeholder=""
-                value={detail}
-                onChange={(e) => setDetail(e.target.value)}
-                className="text-base min-h-10 py-2"
-              />
-            </div>
+            <Button onClick={handleSearch} className="px-5 text-base shrink-0 cursor-pointer rounded-md h-auto">
+              검색
+            </Button>
           </div>
+        </div>
+        <div>
+          <Label className="text-lg font-semibold mb-1 block">상세주소</Label>
+          <Input
+            placeholder=""
+            value={detail}
+            onChange={(e) => setDetail(e.target.value)}
+            className="!text-base min-h-10 py-2"
+          />
+        </div>
+        <div className="flex justify-center">
           <Button
             onClick={handleQuery}
             disabled={loading}
@@ -158,7 +156,7 @@ export default function Home() {
 
       {/* 결과 */}
       {areaResult && (
-        <div className="w-full max-w-5xl mx-auto mt-6 space-y-6">
+        <div className="w-full max-w-2xl mx-auto mt-6 rounded-lg border bg-card p-6 space-y-6">
           {/* 1. 기본 정보 */}
           {buildingInfo && <BasicInfoSection building={buildingInfo} area={areaResult} />}
 

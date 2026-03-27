@@ -19,7 +19,6 @@ export interface AreaResult {
   supplyArea: number;
   supplyAreaPy: number;
   typeName: string | null;
-  typeMismatch: boolean;
 }
 
 export interface BuildingInfo {

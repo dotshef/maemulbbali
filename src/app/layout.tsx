@@ -27,7 +27,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-[Pretendard,sans-serif]">
         <header className="border-b bg-card">
-          <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+          <div className="max-w-2xl mx-auto flex items-center justify-between px-4 py-3">
             <span className="text-lg font-bold text-primary">매물 정보 조회</span>
             <a
               href="mailto:support@maemul.ok"

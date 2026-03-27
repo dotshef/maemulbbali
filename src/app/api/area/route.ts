@@ -14,21 +14,34 @@ interface TypeInfo {
   area: number;
 }
 
-async function lookupType(buildingCode: string, ho: string): Promise<TypeInfo | null> {
+async function lookupType(buildingCode: string, dong: string, ho: string): Promise<TypeInfo | null> {
   try {
     const indexPath = path.join(process.cwd(), "public", "data", "index.json");
     const indexData = JSON.parse(await readFile(indexPath, "utf-8"));
+    console.log("[lookupType] buildingCode:", buildingCode, "dong:", dong, "ho:", ho);
+    console.log("[lookupType] index keys:", Object.keys(indexData));
     const csvFile = indexData[buildingCode];
+    console.log("[lookupType] csvFile:", csvFile);
     if (!csvFile) return null;
 
     const csvPath = path.join(process.cwd(), "public", "data", csvFile);
     const csvText = await readFile(csvPath, "utf-8");
-    const lines = csvText.trim().split("\n").slice(1); // skip header
+    const lines = csvText.trim().split("\n");
+    const header = lines[0].split(",").map(h => h.trim());
+    const hasDong = header.includes("dong");
 
-    for (const line of lines) {
-      const [csvHo, csvType, csvArea] = line.split(",");
-      if (csvHo.trim() === ho) {
-        return { type: csvType.trim(), area: parseFloat(csvArea.trim()) };
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",").map(c => c.trim());
+      if (hasDong) {
+        // dong,ho,type
+        if (cols[0] === dong && cols[1] === ho) {
+          return { type: cols[2], area: 0 };
+        }
+      } else {
+        // ho,type,area
+        if (cols[0] === ho) {
+          return { type: cols[1], area: parseFloat(cols[2]) };
+        }
       }
     }
     return null;
@@ -179,19 +192,8 @@ export async function GET(req: NextRequest) {
     console.log("[area] 면적 결과:", { exclusiveArea, commonArea, supplyArea });
 
     // CSV에서 타입 정보 조회
-    const typeInfo = await lookupType(buildingCode, ho);
-    let typeName: string | null = null;
-    let typeMismatch = false;
-
-    if (typeInfo) {
-      const roundedSupply = Math.round(supplyArea * 100) / 100;
-      if (typeInfo.area === roundedSupply) {
-        typeName = typeInfo.type;
-      } else {
-        typeMismatch = true;
-        console.log("[area] 타입 면적 불일치:", { csv: typeInfo.area, apiSupply: roundedSupply });
-      }
-    }
+    const typeInfo = await lookupType(buildingCode, dong, ho);
+    const typeName = typeInfo?.type ?? null;
 
     return NextResponse.json({
       dong: dong || null,
@@ -205,7 +207,6 @@ export async function GET(req: NextRequest) {
       supplyArea: Math.round(supplyArea * 100) / 100,
       supplyAreaPy: toPyeong(supplyArea),
       typeName,
-      typeMismatch,
     });
   } catch (err) {
     if (err instanceof DOMException && err.name === "TimeoutError") {

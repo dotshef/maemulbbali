@@ -159,7 +159,7 @@ export default function Home() {
                     <p className="text-muted-foreground">주소를 검색해주세요</p>
                   )}
                 </div>
-                <Button onClick={handleSearch} className="text-base shrink-0 cursor-pointer rounded-none h-auto">
+                <Button onClick={handleSearch} className="text-base shrink-0 cursor-pointer rounded-md h-auto">
                   검색
                 </Button>
               </div>

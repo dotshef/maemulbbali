@@ -58,19 +58,42 @@ export async function GET(req: NextRequest) {
       pageNo: "1",
     };
 
-    // 1차: 표준 분리형 (dongNm=101, hoNm=1310호)
-    let rows = await fetchRows({
+    // hoNm 저장 형식이 건물마다 다르므로 순차적으로 시도
+    // 예: "408호", "408", "102동720호" 등
+    const attempts: Record<string, string>[] = [];
+
+    // 1차: 표준 분리형 (dongNm=101, hoNm=408호)
+    attempts.push({
       ...base,
       ...(dong ? { dongNm: dong } : {}),
       hoNm: `${ho}호`,
     });
 
-    // 2차: 합쳐진 형태 (hoNm=101동1310호) — 일부 건물이 이 패턴 사용
-    if (rows.length === 0 && dong) {
-      rows = await fetchRows({
+    // 2차: "호" 없이 숫자만 (hoNm=408)
+    attempts.push({
+      ...base,
+      ...(dong ? { dongNm: dong } : {}),
+      hoNm: ho,
+    });
+
+    // 3차: 동+호 합쳐진 형태 (hoNm=102동720호)
+    if (dong) {
+      attempts.push({
         ...base,
         hoNm: `${dong}동${ho}호`,
       });
+
+      // 4차: 동+호 합쳐진 형태, "호" 없이 (hoNm=102동720)
+      attempts.push({
+        ...base,
+        hoNm: `${dong}동${ho}`,
+      });
+    }
+
+    let rows: RawRow[] = [];
+    for (const params of attempts) {
+      rows = await fetchRows(params);
+      if (rows.length > 0) break;
     }
 
     if (rows.length === 0) {

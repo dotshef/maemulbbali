@@ -26,6 +26,17 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-[Pretendard,sans-serif]">
+        <header className="border-b bg-card">
+          <div className="max-w-lg mx-auto flex items-center justify-between px-4 py-3">
+            <span className="text-lg font-bold text-primary">매물OK</span>
+            <a
+              href="mailto:support@maemul.ok"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              문의하기
+            </a>
+          </div>
+        </header>
         {children}
       </body>
     </html>

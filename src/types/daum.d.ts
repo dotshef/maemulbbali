@@ -2,6 +2,9 @@ interface DaumPostcodeData {
   zonecode: string;
   address: string;
   jibunAddress: string;
+  roadAddress: string;
+  autoJibunAddress: string;
+  autoRoadAddress: string;
   bcode: string;
   buildingCode: string;
   buildingName: string;

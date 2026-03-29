@@ -19,7 +19,7 @@ npx tsc --noEmit # 타입 체크
 ### 인증 흐름
 
 1. 이메일 OTP 인증 → 회원가입 → JWT access token(1일) + refresh token(30일) 발급
-2. `src/proxy.ts`가 Next.js 16 proxy 컨벤션으로 모든 요청을 가로채 인증 처리
+2. `src/proxy.ts`가 Next.js 16 proxy 컨벤션으로 모든 요청을 가로채 인증 처리 (`src/lib/auth.ts`의 `verifyAccessToken` 사용)
    - 미인증 → `/login` 리디렉션
    - 인증 + `/login`, `/signup`, `/` → `/area` 리디렉션
    - access token 만료 시 refresh token으로 자동 갱신
@@ -38,7 +38,10 @@ npx tsc --noEmit # 타입 체크
 | 경로 | 설명 |
 |---|---|
 | `src/proxy.ts` | 인증 미들웨어 (Next.js 16 proxy) |
-| `src/lib/auth.ts` | JWT/세션 유틸리티 |
+| `src/lib/auth.ts` | JWT/세션 유틸리티 + 토큰 발급 (`issueTokensAndSetCookies`) |
+| `src/lib/address.ts` | 건축물 코드 파싱 (`parseBuildingCode`), 상세주소 파싱 (`parseDetail`) |
+| `src/lib/validation.ts` | 회원가입 유효성 검증 (서버/클라이언트 공통) |
+| `src/lib/api-error.ts` | 서버 API 에러 응답 핸들러 (`handleApiError`) |
 | `src/lib/supabase.ts` | Supabase 서버 클라이언트 (service role) |
 | `src/app/area/page.tsx` | 메인 조회 페이지 |
 | `src/app/api/area/route.ts` | 면적 조회 API (정부 API 연동) |
@@ -60,6 +63,13 @@ npx tsc --noEmit # 타입 체크
 ## DB 규칙
 
 - 국내 전용 서비스이므로 `timestamptz` 대신 `timestamp`를 사용한다.
+
+## API 규칙
+
+- 모든 API route에서 `NextResponse.json()` 사용. `Response.json()` 사용 금지.
+- 서버 API의 에러 처리는 `handleApiError()` (`src/lib/api-error.ts`) 사용.
+- 토큰 발급은 `issueTokensAndSetCookies()` (`src/lib/auth.ts`) 사용. 각 route에서 직접 토큰 생성 금지.
+- 유효성 검증은 `src/lib/validation.ts`에 정의하고 서버/클라이언트 양쪽에서 공통 사용.
 
 ## UI 규칙
 

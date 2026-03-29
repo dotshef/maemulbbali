@@ -1,6 +1,18 @@
 export interface AddressInfo {
   jibunAddress: string;
+  roadAddress: string;
   buildingName: string;
+  sigunguCd: string;
+  bjdongCd: string;
+  bun: string;
+  ji: string;
+}
+
+export interface Bookmark {
+  id: string;
+  jibunAddress: string;
+  roadAddress: string;
+  buildingName: string | null;
   sigunguCd: string;
   bjdongCd: string;
   bun: string;

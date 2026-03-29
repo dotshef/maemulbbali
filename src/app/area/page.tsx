@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { BasicInfoSection } from "@/components/result/BasicInfoSection";
 import { AreaSection } from "@/components/result/AreaSection";
 import { FloorSection } from "@/components/result/FloorSection";
 import { fetchArea, fetchBuilding } from "@/lib/api";
 import { parseBuildingCode, parseDetail } from "@/lib/address";
-import type { AddressInfo, AreaResult, BuildingInfo } from "@/types/building";
+import type { AddressInfo, AreaResult, BuildingInfo, Bookmark } from "@/types/building";
 
 export default function AreaPage() {
   const [address, setAddress] = useState<AddressInfo | null>(null);
@@ -18,13 +19,33 @@ export default function AreaPage() {
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfo | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [selectedBookmarkId, setSelectedBookmarkId] = useState<string>("");
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+  const loadBookmarks = useCallback(async () => {
+    try {
+      const res = await fetch("/api/bookmarks");
+      if (res.ok) {
+        const { bookmarks } = await res.json();
+        setBookmarks(bookmarks);
+      }
+    } catch (err) {
+      console.error("[bookmarks] fetch error:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBookmarks();
+  }, [loadBookmarks]);
 
   const handleSearch = () => {
     new daum.Postcode({
       oncomplete(data: DaumPostcodeData) {
         const { sigunguCd, bjdongCd, bun, ji } = parseBuildingCode(data.buildingCode);
         setAddress({
-          jibunAddress: data.jibunAddress || data.address,
+          jibunAddress: data.jibunAddress || data.autoJibunAddress,
+          roadAddress: data.roadAddress || data.autoRoadAddress,
           buildingName: data.buildingName,
           sigunguCd,
           bjdongCd,
@@ -36,6 +57,56 @@ export default function AreaPage() {
         setError("");
       },
     }).open();
+  };
+
+  const handleBookmarkSelect = (id: string | null) => {
+    if (!id) return;
+    const bm = bookmarks.find((b) => b.id === id);
+    if (!bm) return;
+    setSelectedBookmarkId(id);
+    setAddress({
+      jibunAddress: bm.jibunAddress,
+      roadAddress: bm.roadAddress,
+      buildingName: bm.buildingName || "",
+      sigunguCd: bm.sigunguCd,
+      bjdongCd: bm.bjdongCd,
+      bun: bm.bun,
+      ji: bm.ji,
+    });
+    setAreaResult(null);
+    setBuildingInfo(null);
+    setError("");
+  };
+
+  const selectedBookmark = bookmarks.find((b) => b.id === selectedBookmarkId);
+
+  const handleAddBookmark = async () => {
+    if (!address) return;
+    setBookmarkLoading(true);
+    try {
+      const res = await fetch("/api/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jibunAddress: address.jibunAddress,
+          roadAddress: address.roadAddress,
+          buildingName: address.buildingName || null,
+          sigunguCd: address.sigunguCd,
+          bjdongCd: address.bjdongCd,
+          bun: address.bun,
+          ji: address.ji,
+        }),
+      });
+      if (res.status === 409) {
+        setError("이미 북마크에 추가된 주소입니다.");
+      } else if (res.ok) {
+        await loadBookmarks();
+      }
+    } catch (err) {
+      console.error("[bookmarks] add error:", err);
+    } finally {
+      setBookmarkLoading(false);
+    }
   };
 
   const handleQuery = async () => {
@@ -94,6 +165,41 @@ export default function AreaPage() {
     <main className="flex flex-1 flex-col px-4 py-6">
       {/* 검색 폼 */}
       <div className="w-full max-w-2xl mx-auto rounded-lg border bg-card p-6 space-y-4">
+        {/* 북마크 드롭다운 */}
+        {bookmarks.length > 0 && (
+          <div>
+            <Label className="text-xl font-semibold mb-1 block">북마크</Label>
+            <Select onValueChange={handleBookmarkSelect}>
+              <SelectTrigger className="w-full text-base min-h-14 h-auto py-3">
+                {selectedBookmark ? (
+                  <div className="flex flex-col text-left">
+                    <span>
+                      {selectedBookmark.jibunAddress}
+                      {selectedBookmark.buildingName ? ` (${selectedBookmark.buildingName})` : ""}
+                    </span>
+                    <span className="text-muted-foreground">{selectedBookmark.roadAddress}</span>
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground">북마크를 선택하세요</span>
+                )}
+              </SelectTrigger>
+              <SelectContent>
+                {bookmarks.map((bm) => (
+                  <SelectItem key={bm.id} value={bm.id} className="text-base py-2">
+                    <div className="flex flex-col">
+                      <span>
+                        {bm.jibunAddress}
+                        {bm.buildingName ? ` (${bm.buildingName})` : ""}
+                      </span>
+                      <span className="text-muted-foreground">{bm.roadAddress}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <div>
           <Label className="text-xl font-semibold mb-1 block">주소</Label>
           <div className="flex gap-2">
@@ -111,6 +217,18 @@ export default function AreaPage() {
               검색
             </Button>
           </div>
+          {/* 북마크 추가 버튼 */}
+          {address && (
+            <div className="flex justify-end mt-2">
+              <Button
+                onClick={handleAddBookmark}
+                disabled={bookmarkLoading}
+                className="px-5 py-2 text-base cursor-pointer rounded-md h-auto bg-blue-900"
+              >
+                {bookmarkLoading ? "추가 중..." : "북마크 추가"}
+              </Button>
+            </div>
+          )}
         </div>
         <div>
           <Label className="text-xl font-semibold mb-1 block">상세주소</Label>
@@ -125,7 +243,7 @@ export default function AreaPage() {
           <Button
             onClick={handleQuery}
             disabled={loading}
-            className="text-lg px-8 min-h-10 cursor-pointer"
+            className="text-xl px-8 py-6 min-h-10 cursor-pointer"
           >
             {loading ? "조회 중..." : "조회"}
           </Button>

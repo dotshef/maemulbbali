@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const tabs = [
   { label: "매물 면적 정보 조회", href: "/area" },
+  { label: "북마크 관리", href: "/bookmarks" },
 ];
 
 export function HeaderNav() {

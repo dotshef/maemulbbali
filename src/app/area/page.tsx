@@ -80,6 +80,16 @@ export default function AreaPage() {
 
   const selectedBookmark = bookmarks.find((b) => b.id === selectedBookmarkId);
 
+  const isAlreadyBookmarked = address
+    ? bookmarks.some(
+        (b) =>
+          b.sigunguCd === address.sigunguCd &&
+          b.bjdongCd === address.bjdongCd &&
+          b.bun === address.bun &&
+          b.ji === address.ji
+      )
+    : false;
+
   const handleAddBookmark = async () => {
     if (!address) return;
     setBookmarkLoading(true);
@@ -218,7 +228,7 @@ export default function AreaPage() {
             </Button>
           </div>
           {/* 북마크 추가 버튼 */}
-          {address && (
+          {address && !isAlreadyBookmarked && (
             <div className="flex justify-end mt-2">
               <Button
                 onClick={handleAddBookmark}

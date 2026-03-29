@@ -75,3 +75,32 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, bookmark: { id: data.id } });
 }
+
+export async function DELETE(req: NextRequest) {
+  const token = req.cookies.get("access_token")?.value;
+  const user = token ? verifyAccessToken(token) : null;
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing bookmark id" }, { status: 400 });
+  }
+
+  const { error } = await supabase
+    .from("user_bookmarks")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("[bookmarks] delete error:", error);
+    return NextResponse.json({ error: "Failed to delete bookmark" }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { supabase } from "@/lib/supabase";
+import { otpEmailTemplate } from "@/lib/email-template/otp";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "이미 가입된 이메일입니다." }, { status: 409 });
   }
 
-  // 6자리 코�� 생성
+  // 6자리 코드 생성
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10분
 
@@ -36,10 +37,10 @@ export async function POST(request: Request) {
 
   // 이메일 발송
   const { error } = await resend.emails.send({
-    from: "매물빨리 <noreply@dotshef.com>",
+    from: "매물빨리 <contact@dotshef.com>",
     to: [email],
-    subject: "[매물빨리] 이메일 인증코드",
-    text: `인증코드: ${code}\n\n10분 내에 입력해주��요.`,
+    subject: "[매물빨리] 회원가입 이메일 인증코드",
+    html: otpEmailTemplate(code),
   });
 
   if (error) {

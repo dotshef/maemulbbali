@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
-import { signToken, sessionCookieOptions } from "@/lib/auth";
+import {
+  signAccessToken,
+  generateRefreshToken,
+  refreshTokenExpiresAt,
+  accessTokenCookie,
+  refreshTokenCookie,
+} from "@/lib/auth";
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
@@ -48,14 +54,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "회원가입에 실패했습니다." }, { status: 500 });
   }
 
-  // 인증 기록 삭제
-  await supabase.from("email_verifications").delete().eq("email", email);
+  // 토큰 발급
+  const accessToken = signAccessToken({ id: user.id, email: user.email });
+  const refreshToken = generateRefreshToken();
+  const expiresAt = refreshTokenExpiresAt();
 
-  // 세션 쿠키 설정
-  const token = signToken({ id: user.id, email: user.email });
-  const cookie = sessionCookieOptions(token);
+  // refresh token DB 저장
+  await supabase.from("refresh_tokens").insert({
+    user_id: user.id,
+    token: refreshToken,
+    expires_at: expiresAt.toISOString(),
+  });
+
   const response = NextResponse.json({ success: true });
-  response.cookies.set(cookie);
+  response.cookies.set(accessTokenCookie(accessToken));
+  response.cookies.set(refreshTokenCookie(refreshToken));
 
   return response;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function ContactModal() {
@@ -10,6 +10,17 @@ export default function ContactModal() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user?.email) {
+          setEmail(data.user.email);
+        }
+      })
+      .catch(() => {});
+  }, [open]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,7 +60,7 @@ export default function ContactModal() {
     <>
       <Button
         onClick={() => setOpen(true)}
-        className="text-base font-semibold px-5 py-2 h-auto"
+        className="text-base font-semibold px-5 py-2 h-auto cursor-pointer"
       >
         문의하기
       </Button>
@@ -57,13 +68,6 @@ export default function ContactModal() {
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setOpen(false);
-              setStatus("idle");
-              setErrorMsg("");
-            }
-          }}
         >
           <div className="w-full max-w-md mx-4 rounded-xl bg-card p-6 ring-1 ring-foreground/10 shadow-lg">
             <div className="flex items-center justify-between mb-4">
@@ -74,7 +78,7 @@ export default function ContactModal() {
                   setStatus("idle");
                   setErrorMsg("");
                 }}
-                className="text-muted-foreground hover:text-foreground transition-colors text-xl leading-none"
+                className="text-muted-foreground hover:text-foreground transition-colors text-xl leading-none cursor-pointer"
               >
                 ✕
               </button>
@@ -117,7 +121,7 @@ export default function ContactModal() {
                 <Button
                   type="submit"
                   disabled={status === "loading"}
-                  className="w-full mt-4 h-10 text-base font-semibold"
+                  className="w-full mt-4 h-10 text-base font-semibold cursor-pointer"
                 >
                   {status === "loading" ? "전송 중..." : "제출하기"}
                 </Button>

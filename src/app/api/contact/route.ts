@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { contactEmailTemplate } from "@/lib/email-template/contact";
 
 export async function POST(request: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY);
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     to: ["contact@dotshef.com"],
     replyTo: `${name} <${email}>`,
     subject: "[매물빨리] 새로운 문의가 접수되었습니다",
-    text: `이름: ${name}\n이메일: ${email}\n\n${message}`,
+    html: contactEmailTemplate(name, email, message),
   });
 
   if (error) {

@@ -1,19 +1,21 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const COOKIE_NAME = "session";
 
 export interface SessionUser {
   id: string;
   email: string;
 }
 
-export function signToken(payload: SessionUser): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+// --- Access Token (1일) ---
+
+export function signAccessToken(payload: SessionUser): string {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
 }
 
-export function verifyToken(token: string): SessionUser | null {
+export function verifyAccessToken(token: string): SessionUser | null {
   try {
     return jwt.verify(token, JWT_SECRET) as SessionUser;
   } catch {
@@ -21,21 +23,55 @@ export function verifyToken(token: string): SessionUser | null {
   }
 }
 
-export async function getSessionUser(): Promise<SessionUser | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifyToken(token);
+// --- Refresh Token (30일) ---
+
+export function generateRefreshToken(): string {
+  return crypto.randomBytes(48).toString("base64url");
 }
 
-export function sessionCookieOptions(token: string) {
+export function refreshTokenExpiresAt(): Date {
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+}
+
+// --- Session helper (Server Component용) ---
+
+export async function getSessionUser(): Promise<SessionUser | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+  if (!token) return null;
+  return verifyAccessToken(token);
+}
+
+// --- Cookie options ---
+
+const cookieBase = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+};
+
+export function accessTokenCookie(token: string) {
   return {
-    name: COOKIE_NAME,
+    ...cookieBase,
+    name: "access_token",
     value: token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24, // 1일
   };
+}
+
+export function refreshTokenCookie(token: string) {
+  return {
+    ...cookieBase,
+    name: "refresh_token",
+    value: token,
+    maxAge: 60 * 60 * 24 * 30, // 30일
+  };
+}
+
+export function clearCookies() {
+  return [
+    { ...cookieBase, name: "access_token", value: "", maxAge: 0 },
+    { ...cookieBase, name: "refresh_token", value: "", maxAge: 0 },
+  ];
 }

@@ -69,9 +69,9 @@ export default function ContactModal() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
         >
-          <div className="w-full max-w-md mx-4 rounded-xl bg-card p-6 ring-1 ring-foreground/10 shadow-lg">
+          <div className="w-full max-w-lg mx-4 rounded-xl bg-card p-8 ring-1 ring-foreground/10 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-foreground">문의하기</h2>
+              <h2 className="text-xl font-bold text-foreground">문의하기</h2>
               <button
                 onClick={() => {
                   setOpen(false);
@@ -83,6 +83,10 @@ export default function ContactModal() {
                 ✕
               </button>
             </div>
+
+            <p className="mb-4 text-base text-muted-foreground">
+              불편한 사항이나 건의하고 싶은 내용을 자유롭게 작성해주세요
+            </p>
 
             {status === "success" ? (
               <p className="text-center py-8 text-foreground font-medium">
@@ -96,7 +100,7 @@ export default function ContactModal() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="이름"
                   required
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <input
                   type="email"
@@ -104,18 +108,18 @@ export default function ContactModal() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="이메일"
                   required
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="문의 내용을 입력해주세요"
                   rows={6}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                 />
 
                 {status === "error" && (
-                  <p className="mt-2 text-sm text-destructive">{errorMsg}</p>
+                  <p className="mt-2 text-base text-destructive">{errorMsg}</p>
                 )}
 
                 <Button

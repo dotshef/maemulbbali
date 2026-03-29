@@ -14,14 +14,14 @@ export function AreaSection({ data }: { data: AreaResult }) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-3 border-l-4 border-primary pl-3">면적</h2>
+      <h2 className="text-xl font-semibold mb-3 border-l-4 border-primary pl-3">면적</h2>
       <div className="grid grid-cols-2 gap-4">
         {/* 타입 */}
         <div className="rounded-lg border bg-muted/40 p-5">
           {data.typeName ? (
             <div className="grid grid-cols-[1fr_auto] gap-x-4 items-center h-full">
               <div>
-                <p className="text-sm text-muted-foreground">타입</p>
+                <p className="text-base text-muted-foreground">타입</p>
                 <p className="text-2xl font-bold mt-1">{data.typeName}</p>
               </div>
               <button
@@ -33,8 +33,8 @@ export function AreaSection({ data }: { data: AreaResult }) {
             </div>
           ) : (
             <>
-              <p className="text-sm text-muted-foreground">타입</p>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-base text-muted-foreground">타입</p>
+              <p className="text-base text-muted-foreground mt-1">
                 타입 정보가 지원되지 않습니다.
               </p>
             </>
@@ -45,7 +45,7 @@ export function AreaSection({ data }: { data: AreaResult }) {
         <div className="rounded-lg border bg-muted/40 p-5">
           <div className="grid grid-cols-[1fr_auto] gap-x-4 items-center h-full">
             <div>
-              <p className="text-sm text-muted-foreground">전용면적</p>
+              <p className="text-base text-muted-foreground">전용면적</p>
               <p className="text-2xl font-bold mt-1">
                 {data.exclusiveArea}㎡
                 <span className="text-base font-normal text-muted-foreground ml-2">
@@ -66,7 +66,7 @@ export function AreaSection({ data }: { data: AreaResult }) {
         <div className="rounded-lg border bg-muted/40 p-5">
           <div className="grid grid-cols-[1fr_auto] gap-x-4 items-center h-full">
             <div>
-              <p className="text-sm text-muted-foreground">공용면적</p>
+              <p className="text-base text-muted-foreground">공용면적</p>
               <p className="text-2xl font-bold mt-1">
                 {data.commonArea}㎡
                 <span className="text-base font-normal text-muted-foreground ml-2">
@@ -87,7 +87,7 @@ export function AreaSection({ data }: { data: AreaResult }) {
         <div className="rounded-lg border bg-muted/40 p-5">
           <div className="grid grid-cols-[1fr_auto] gap-x-4 items-center h-full">
             <div>
-              <p className="text-sm text-muted-foreground">계약면적</p>
+              <p className="text-base text-muted-foreground">계약면적</p>
               <p className="text-2xl font-bold mt-1">
                 {data.supplyArea}㎡
                 <span className="text-base font-normal text-muted-foreground ml-2">

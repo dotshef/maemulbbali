@@ -216,7 +216,7 @@ export default function SignupPage() {
 
           {error && <p className="text-base text-destructive">{error}</p>}
         </form>
-        <p className="text-sm text-center text-muted-foreground">
+        <p className="text-base text-center text-muted-foreground">
           이미 계정이 있으신가요?{" "}
           <Link href="/login" className="text-primary font-semibold hover:underline">
             로그인

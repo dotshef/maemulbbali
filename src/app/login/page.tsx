@@ -70,7 +70,7 @@ export default function LoginPage() {
             {loading ? "로그인 중..." : "로그인"}
           </Button>
         </form>
-        <p className="text-sm text-center text-muted-foreground">
+        <p className="text-base text-center text-muted-foreground">
           계정이 없으신가요?{" "}
           <Link href="/signup" className="text-primary font-semibold hover:underline">
             회원가입

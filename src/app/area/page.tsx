@@ -121,7 +121,7 @@ export default function AreaPage() {
       {/* 검색 폼 */}
       <div className="w-full max-w-2xl mx-auto rounded-lg border bg-card p-6 space-y-4">
         <div>
-          <Label className="text-lg font-semibold mb-1 block">주소</Label>
+          <Label className="text-xl font-semibold mb-1 block">주소</Label>
           <div className="flex gap-2">
             <div className="flex-1 rounded-md border bg-muted px-3 py-2 text-base min-h-10">
               {address ? (
@@ -139,7 +139,7 @@ export default function AreaPage() {
           </div>
         </div>
         <div>
-          <Label className="text-lg font-semibold mb-1 block">상세주소</Label>
+          <Label className="text-xl font-semibold mb-1 block">상세주소</Label>
           <Input
             placeholder=""
             value={detail}

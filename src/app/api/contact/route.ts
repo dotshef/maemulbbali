@@ -1,0 +1,35 @@
+import { Resend } from "resend";
+
+export async function POST(request: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { name, email, message } = await request.json();
+
+  if (!name || !name.trim()) {
+    return Response.json({ error: "이름을 입력해주세요." }, { status: 400 });
+  }
+
+  if (!email || !email.trim()) {
+    return Response.json({ error: "이메일을 입력해주세요." }, { status: 400 });
+  }
+
+  if (!message || message.trim().length < 10) {
+    return Response.json(
+      { error: "내용을 10자 이상 입력해주세요." },
+      { status: 400 }
+    );
+  }
+
+  const { error } = await resend.emails.send({
+    from: "닷셰프 <contact@dotshef.com>",
+    to: ["contact@dotshef.com"],
+    replyTo: `${name} <${email}>`,
+    subject: "[매물빨리] 새로운 문의가 접수되었습니다",
+    text: `이름: ${name}\n이메일: ${email}\n\n${message}`,
+  });
+
+  if (error) {
+    return Response.json({ error: "전송에 실패했습니다." }, { status: 500 });
+  }
+
+  return Response.json({ success: true });
+}

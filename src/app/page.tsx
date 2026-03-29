@@ -98,6 +98,17 @@ export default function Home() {
 
       setAreaResult(area);
       setBuildingInfo(building);
+
+      // 조회 기록 저장
+      await fetch("/api/query-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: address.jibunAddress,
+          dong: parsed.dong || null,
+          ho: parsed.ho,
+        }),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "조회 중 오류가 발생했습니다.");
     } finally {

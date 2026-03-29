@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const pretendard = localFont({
@@ -44,6 +45,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

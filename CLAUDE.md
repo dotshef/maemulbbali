@@ -57,6 +57,10 @@ npx tsc --noEmit # 타입 체크
 
 `JWT_SECRET`, `BUILDING_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`
 
+## DB 규칙
+
+- 국내 전용 서비스이므로 `timestamptz` 대신 `timestamp`를 사용한다.
+
 ## UI 규칙
 
 - 고객 연령대가 높으므로 **text-base(16px) 이상만 사용**. text-sm, text-xs 사용 금지 (shadcn 기본 컴포넌트 제외).

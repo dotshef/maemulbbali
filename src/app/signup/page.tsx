@@ -9,17 +9,18 @@ import Link from "next/link";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
-  const [otpCode, setOtpCode] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   // 1. 인증코드 발송
-  const handleSendOtp = async () => {
+  const handleSendCode = async () => {
     setError("");
     if (!email) {
       setError("이메일을 입력해주세요.");
@@ -28,7 +29,7 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    const res = await fetch("/api/auth/send-otp", {
+    const res = await fetch("/api/auth/send-verification", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -41,24 +42,24 @@ export default function SignupPage() {
       return;
     }
 
-    setOtpSent(true);
+    setCodeSent(true);
     setLoading(false);
   };
 
   // 2. 인증코드 확인
-  const handleVerifyOtp = async () => {
+  const handleVerifyCode = async () => {
     setError("");
-    if (!otpCode) {
+    if (!verificationCode) {
       setError("인증코드를 입력해주세요.");
       return;
     }
 
     setLoading(true);
 
-    const res = await fetch("/api/auth/verify-otp", {
+    const res = await fetch("/api/auth/verify-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code: otpCode }),
+      body: JSON.stringify({ email, code: verificationCode }),
     });
     const data = await res.json();
 
@@ -69,7 +70,7 @@ export default function SignupPage() {
     }
 
     setEmailVerified(true);
-    setOtpSent(false);
+    setCodeSent(false);
     setLoading(false);
   };
 
@@ -86,13 +87,17 @@ export default function SignupPage() {
       setError("비밀번호가 일치하지 않습니다.");
       return;
     }
+    if (!companyName.trim()) {
+      setError("업체명을 입력해주세요.");
+      return;
+    }
 
     setLoading(true);
 
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, company_name: companyName.trim() }),
     });
     const data = await res.json();
 
@@ -109,7 +114,7 @@ export default function SignupPage() {
   return (
     <main className="flex flex-1 items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-lg border bg-card p-8 space-y-6">
-        <h1 className="text-2xl font-bold text-center text-primary">매물빨리</h1>
+        <h1 className="text-2xl font-bold text-center text-primary">회원가입</h1>
         <form onSubmit={handleSignup} className="space-y-4">
           {/* 이메일 */}
           <div>
@@ -120,17 +125,17 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="!text-base min-h-10 py-2"
-                disabled={otpSent || emailVerified}
+                disabled={codeSent || emailVerified}
                 required
               />
               {!emailVerified ? (
                 <Button
                   type="button"
-                  onClick={handleSendOtp}
+                  onClick={handleSendCode}
                   disabled={loading}
                   className="shrink-0 text-base min-h-10 cursor-pointer"
                 >
-                  {loading && !otpSent ? "발송 중..." : otpSent ? "재발송" : "인증하기"}
+                  {loading && !codeSent ? "발송 중..." : codeSent ? "재발송" : "인증하기"}
                 </Button>
               ) : (
                 <span className="shrink-0 flex items-center text-base font-medium text-green-600 px-3">
@@ -141,7 +146,7 @@ export default function SignupPage() {
           </div>
 
           {/* 인증코드 입력 */}
-          {otpSent && !emailVerified && (
+          {codeSent && !emailVerified && (
             <div>
               <Label className="text-base mb-1 block">인증코드</Label>
               <div className="flex gap-2">
@@ -149,13 +154,13 @@ export default function SignupPage() {
                   type="text"
                   inputMode="numeric"
                   placeholder="6자리 코드 입력"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
                   className="!text-base min-h-10 py-2"
                 />
                 <Button
                   type="button"
-                  onClick={handleVerifyOtp}
+                  onClick={handleVerifyCode}
                   disabled={loading}
                   className="shrink-0 text-base min-h-10 cursor-pointer"
                 >
@@ -184,6 +189,17 @@ export default function SignupPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="!text-base min-h-10 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-base mb-1 block">업체명</Label>
+                <Input
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  placeholder="업체명을 입력해주세요"
                   className="!text-base min-h-10 py-2"
                   required
                 />

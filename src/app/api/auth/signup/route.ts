@@ -10,10 +10,14 @@ import {
 } from "@/lib/auth";
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
+  const { email, password, company_name } = await request.json();
 
   if (!email || !password) {
     return NextResponse.json({ error: "이메일과 비밀번호를 입력해주세요." }, { status: 400 });
+  }
+
+  if (!company_name?.trim()) {
+    return NextResponse.json({ error: "업체명을 입력해주세요." }, { status: 400 });
   }
 
   if (password.length < 8) {
@@ -46,7 +50,7 @@ export async function POST(request: Request) {
   const passwordHash = await bcrypt.hash(password, 12);
   const { data: user, error } = await supabase
     .from("users")
-    .insert({ email, password_hash: passwordHash })
+    .insert({ email, password_hash: passwordHash, company_name: company_name.trim() })
     .select("id, email")
     .single();
 

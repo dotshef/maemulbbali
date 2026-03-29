@@ -38,21 +38,21 @@ export default function LoginPage() {
 
   return (
     <main className="flex flex-1 items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-lg border bg-card p-8 space-y-6">
+      <div className="w-full max-w-lg rounded-lg border bg-card p-8 space-y-6">
         <h1 className="text-2xl font-bold text-center text-primary">로그인</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <Label className="text-base mb-1 block">이메일</Label>
+            <Label className="text-lg mb-1 block">이메일</Label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="!text-base min-h-10 py-2"
+              className="min-h-10 py-2"
               required
             />
           </div>
           <div>
-            <Label className="text-base mb-1 block">비밀번호</Label>
+            <Label className="text-lg mb-1 block">비밀번호</Label>
             <Input
               type="password"
               value={password}
@@ -65,7 +65,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full text-base min-h-10 cursor-pointer"
+            className="w-full py-6 text-lg min-h-10 font-bold cursor-pointer"
           >
             {loading ? "로그인 중..." : "로그인"}
           </Button>

@@ -20,10 +20,7 @@ async function lookupType(buildingCode: string, dong: string, ho: string): Promi
   try {
     const indexPath = path.join(process.cwd(), "public", "data", "index.json");
     const indexData = JSON.parse(await readFile(indexPath, "utf-8"));
-    console.log("[lookupType] buildingCode:", buildingCode, "dong:", dong, "ho:", ho);
-    console.log("[lookupType] index keys:", Object.keys(indexData));
     const csvFile = indexData[buildingCode];
-    console.log("[lookupType] csvFile:", csvFile);
     if (!csvFile) return null;
 
     const csvPath = path.join(process.cwd(), "public", "data", csvFile);
@@ -85,7 +82,6 @@ export async function GET(req: NextRequest) {
   }
 
   const buildingCode = `${sigunguCd}_${bjdongCd}_${bun}_${ji}`;
-  console.log("[area] buildingCode:", buildingCode);
 
   if (!API_KEY) {
     return NextResponse.json(
@@ -181,17 +177,6 @@ export async function GET(req: NextRequest) {
     const supplyArea = exclusiveArea + commonArea;
     const toPyeong = (m2: number) =>
       Math.round((m2 / 3.306) * 100) / 100;
-
-    console.log("[area] 매칭된 rows:", rows.map(r => ({
-      hoNm: r.hoNm,
-      dongNm: r.dongNm,
-      exposPubuseGbCdNm: r.exposPubuseGbCdNm,
-      area: r.area,
-      regstrKindCdNm: r.regstrKindCdNm,
-      mainPurpsCdNm: r.mainPurpsCdNm,
-      etcPurps: r.etcPurps,
-    })));
-    console.log("[area] 면적 결과:", { exclusiveArea, commonArea, supplyArea });
 
     // CSV에서 타입 정보 조회
     const typeInfo = await lookupType(buildingCode, dong, ho);

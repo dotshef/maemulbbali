@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
 
         // 새 쿠키 설정
         const response = isAuthPage
-          ? NextResponse.redirect(new URL("/", request.url))
+          ? NextResponse.redirect(new URL("/area", request.url))
           : NextResponse.next();
 
         response.cookies.set({
@@ -63,9 +63,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // 인증 + 로그인/회원가입 페이지 → 메인으로
-  if (user && isAuthPage) {
-    return NextResponse.redirect(new URL("/", request.url));
+  // 인증 + 홈 또는 로그인/회원가입 페이지 → /area로
+  if (user && (isAuthPage || pathname === "/")) {
+    return NextResponse.redirect(new URL("/area", request.url));
   }
 
   return NextResponse.next();

@@ -39,7 +39,7 @@ export default function LoginPage() {
   return (
     <main className="flex flex-1 items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-lg border bg-card p-8 space-y-6">
-        <h1 className="text-2xl font-bold text-center text-primary">매물빨리</h1>
+        <h1 className="text-2xl font-bold text-center text-primary">로그인</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <Label className="text-base mb-1 block">이메일</Label>

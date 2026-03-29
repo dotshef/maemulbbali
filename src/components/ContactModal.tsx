@@ -60,7 +60,7 @@ export default function ContactModal() {
     <>
       <Button
         onClick={() => setOpen(true)}
-        className="text-base font-semibold px-5 py-2 h-auto cursor-pointer"
+        className="text-base font-semibold px-6 py-2 h-auto cursor-pointer"
       >
         문의하기
       </Button>

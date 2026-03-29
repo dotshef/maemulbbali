@@ -1,27 +1,19 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
-import {
-  signAccessToken,
-  generateRefreshToken,
-  refreshTokenExpiresAt,
-  accessTokenCookie,
-  refreshTokenCookie,
-} from "@/lib/auth";
+import { issueTokensAndSetCookies } from "@/lib/auth";
+import { signupValidation } from "@/lib/validation";
 
 export async function POST(request: Request) {
   const { email, password, company_name } = await request.json();
 
-  if (!email || !password) {
-    return NextResponse.json({ error: "이메일과 비밀번호를 입력해주세요." }, { status: 400 });
-  }
+  const emailErr = signupValidation.email(email);
+  const pwErr = signupValidation.password(password);
+  const companyErr = signupValidation.companyName(company_name);
+  const validationError = emailErr || pwErr || companyErr;
 
-  if (!company_name?.trim()) {
-    return NextResponse.json({ error: "업체명을 입력해주세요." }, { status: 400 });
-  }
-
-  if (password.length < 8) {
-    return NextResponse.json({ error: "비밀번호는 8자 이상이어야 합니다." }, { status: 400 });
+  if (validationError) {
+    return NextResponse.json({ error: validationError }, { status: 400 });
   }
 
   // 이메일 인증 확인
@@ -58,21 +50,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "회원가입에 실패했습니다." }, { status: 500 });
   }
 
-  // 토큰 발급
-  const accessToken = signAccessToken({ id: user.id, email: user.email });
-  const refreshToken = generateRefreshToken();
-  const expiresAt = refreshTokenExpiresAt();
-
-  // refresh token DB 저장
-  await supabase.from("refresh_tokens").insert({
-    user_id: user.id,
-    token: refreshToken,
-    expires_at: expiresAt.toISOString(),
-  });
-
   const response = NextResponse.json({ success: true });
-  response.cookies.set(accessTokenCookie(accessToken));
-  response.cookies.set(refreshTokenCookie(refreshToken));
+  const { setCookies } = await issueTokensAndSetCookies(user.id, user.email, supabase);
+  setCookies(response);
 
   return response;
 }

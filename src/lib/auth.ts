@@ -69,6 +69,33 @@ export function refreshTokenCookie(token: string) {
   };
 }
 
+// --- 토큰 발급 + 쿠키 세팅 (login/signup 공통) ---
+
+export async function issueTokensAndSetCookies(
+  userId: string,
+  email: string,
+  supabase: { from: (table: string) => { insert: (data: Record<string, unknown>) => unknown } }
+): Promise<{ accessToken: string; refreshToken: string; setCookies: (res: import("next/server").NextResponse) => void }> {
+  const accessToken = signAccessToken({ id: userId, email });
+  const refreshToken = generateRefreshToken();
+  const expiresAt = refreshTokenExpiresAt();
+
+  await supabase.from("refresh_tokens").insert({
+    user_id: userId,
+    token: refreshToken,
+    expires_at: expiresAt.toISOString(),
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    setCookies: (res) => {
+      res.cookies.set(accessTokenCookie(accessToken));
+      res.cookies.set(refreshTokenCookie(refreshToken));
+    },
+  };
+}
+
 export function clearCookies() {
   return [
     { ...cookieBase, name: "access_token", value: "", maxAge: 0 },

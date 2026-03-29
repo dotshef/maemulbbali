@@ -1,18 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-
-interface SessionUser {
-  id: string;
-  email: string;
-}
-
-function verifyAccessToken(token: string): SessionUser | null {
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as SessionUser;
-  } catch {
-    return null;
-  }
-}
+import { verifyAccessToken } from "@/lib/auth";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

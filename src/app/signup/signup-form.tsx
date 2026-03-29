@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { signupValidation } from "@/lib/validation";
 
 export default function SignupForm() {
   const [email, setEmail] = useState("");
@@ -81,16 +82,13 @@ export default function SignupForm() {
     e.preventDefault();
     setError("");
 
-    if (password.length < 8) {
-      setError("비밀번호는 8자 이상이어야 합니다.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-    if (!companyName.trim()) {
-      setError("업체명을 입력해주세요.");
+    const validationError =
+      signupValidation.password(password) ||
+      signupValidation.confirmPassword(password, confirmPassword) ||
+      signupValidation.companyName(companyName);
+
+    if (validationError) {
+      setError(validationError);
       return;
     }
 

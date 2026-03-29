@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
-import {
-  signAccessToken,
-  generateRefreshToken,
-  refreshTokenExpiresAt,
-  accessTokenCookie,
-  refreshTokenCookie,
-} from "@/lib/auth";
+import { issueTokensAndSetCookies } from "@/lib/auth";
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
@@ -31,21 +25,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "이메일 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
   }
 
-  // 토큰 발급
-  const accessToken = signAccessToken({ id: user.id, email: user.email });
-  const refreshToken = generateRefreshToken();
-  const expiresAt = refreshTokenExpiresAt();
-
-  // refresh token DB 저장
-  await supabase.from("refresh_tokens").insert({
-    user_id: user.id,
-    token: refreshToken,
-    expires_at: expiresAt.toISOString(),
-  });
-
   const response = NextResponse.json({ success: true });
-  response.cookies.set(accessTokenCookie(accessToken));
-  response.cookies.set(refreshTokenCookie(refreshToken));
+  const { setCookies } = await issueTokensAndSetCookies(user.id, user.email, supabase);
+  setCookies(response);
 
   return response;
 }

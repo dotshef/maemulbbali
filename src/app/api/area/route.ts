@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
+import { handleApiError } from "@/lib/api-error";
 
 const API_KEY = process.env.BUILDING_API_KEY ?? "";
 const API_URL =
@@ -194,15 +195,6 @@ return NextResponse.json({
       typeName,
     });
   } catch (err) {
-    if (err instanceof DOMException && err.name === "TimeoutError") {
-      return NextResponse.json(
-        { error: "조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요." },
-        { status: 504 }
-      );
-    }
-    return NextResponse.json(
-      { error: "조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요." },
-      { status: 500 }
-    );
+    return handleApiError(err);
   }
 }

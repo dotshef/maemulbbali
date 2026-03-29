@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { contactEmailTemplate } from "@/lib/email-template/contact";
 
@@ -6,15 +7,15 @@ export async function POST(request: Request) {
   const { name, email, message } = await request.json();
 
   if (!name || !name.trim()) {
-    return Response.json({ error: "이름을 입력해주세요." }, { status: 400 });
+    return NextResponse.json({ error: "이름을 입력해주세요." }, { status: 400 });
   }
 
   if (!email || !email.trim()) {
-    return Response.json({ error: "이메일을 입력해주세요." }, { status: 400 });
+    return NextResponse.json({ error: "이메일을 입력해주세요." }, { status: 400 });
   }
 
   if (!message || message.trim().length < 10) {
-    return Response.json(
+    return NextResponse.json(
       { error: "내용을 10자 이상 입력해주세요." },
       { status: 400 }
     );
@@ -29,8 +30,8 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return Response.json({ error: "전송에 실패했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "전송에 실패했습니다." }, { status: 500 });
   }
 
-  return Response.json({ success: true });
+  return NextResponse.json({ success: true });
 }

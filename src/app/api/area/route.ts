@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
-import { verifyAccessToken } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
 
 const API_KEY = process.env.BUILDING_API_KEY ?? "";
 const API_URL =
@@ -182,27 +180,7 @@ export async function GET(req: NextRequest) {
     const typeInfo = await lookupType(buildingCode, dong, ho);
     const typeName = typeInfo?.type ?? null;
 
-    // 로그인된 사용자면 조회 로그 기록
-    const token = req.cookies.get("access_token")?.value;
-    const user = token ? verifyAccessToken(token) : null;
-    if (user) {
-      supabase
-        .from("user_area_request_log")
-        .insert({
-          user_id: user.id,
-          sigungu_cd: sigunguCd,
-          bjdong_cd: bjdongCd,
-          bun,
-          ji,
-          dong: dong || null,
-          ho,
-        })
-        .then(({ error }) => {
-          if (error) console.error("[query_logs] insert error:", error);
-        });
-    }
-
-    return NextResponse.json({
+return NextResponse.json({
       dong: dong || null,
       ho,
       flrNo,

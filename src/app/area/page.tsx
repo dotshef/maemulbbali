@@ -98,15 +98,18 @@ export default function AreaPage() {
       setBuildingInfo(building);
 
       // 조회 기록 저장
-      await fetch("/api/query-log", {
+      fetch("/api/user-area-request-log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          address: address.jibunAddress,
+          sigunguCd: address.sigunguCd,
+          bjdongCd: address.bjdongCd,
+          bun: address.bun,
+          ji: address.ji,
           dong: parsed.dong || null,
           ho: parsed.ho,
         }),
-      });
+      }).catch((err) => console.error("[user-area-request-log]", err));
     } catch (err) {
       setError(err instanceof Error ? err.message : "조회 중 오류가 발생했습니다.");
     } finally {

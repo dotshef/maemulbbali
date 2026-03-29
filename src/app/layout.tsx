@@ -12,8 +12,21 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "매물 면적 정보 조회 | 매물빨리",
+  metadataBase: new URL("https://www.maemulbbali.site"),
+  title: {
+    default: "매물 면적 정보 조회 | 매물빨리",
+    template: "%s | 매물빨리",
+  },
   description: "등록하려는 매물의 타입·전용·공용·공급면적을 즉시 조회하세요",
+  openGraph: {
+    title: "매물빨리 — 매물 면적 즉시 조회",
+    description:
+      "건축물대장 기반 전용·공용·공급면적을 즉시 조회하는 부동산 서비스",
+    type: "website",
+    locale: "ko_KR",
+    url: "https://www.maemulbbali.site",
+    siteName: "매물빨리",
+  },
 };
 
 export default function RootLayout({

@@ -44,6 +44,7 @@ export default function SignupForm() {
       return;
     }
 
+    setVerificationCode("");
     setCodeSent(true);
     setLoading(false);
   };
@@ -118,8 +119,8 @@ export default function SignupForm() {
         <div className="flex flex-col gap-10">
           {/* 1단계: 이메일 인증 */}
           {!emailVerified && (
-            <form onSubmit={codeSent ? handleVerifyCode : handleSendCode} className="space-y-4">
-              <div>
+            <div className="space-y-4">
+              <form onSubmit={handleSendCode}>
                 <Label className="text-lg mb-1 block">이메일</Label>
                 <div className="flex gap-2">
                   <Input
@@ -131,41 +132,40 @@ export default function SignupForm() {
                       required
                   />
                   <Button
-                      type={codeSent ? "button" : "submit"}
-                      onClick={codeSent ? handleSendCode : undefined}
+                      type="submit"
                       disabled={loading}
                       className="shrink-0 text-lg p-5 min-h-10 cursor-pointer"
                   >
                     {loading && !codeSent ? "발송 중..." : codeSent ? "재발송" : "인증하기"}
                   </Button>
                 </div>
-              </div>
+              </form>
 
               {codeSent && (
-                  <div>
-                    <Label className="text-lg mb-1 block">인증코드</Label>
-                    <div className="flex gap-2">
-                      <Input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder="6자리 코드 입력"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
-                          className="!text-base min-h-10 py-2"
-                      />
-                      <Button
-                          type="submit"
-                          disabled={loading}
-                          className="shrink-0 text-lg p-5 min-h-10 cursor-pointer"
-                      >
-                        {loading ? "확인 중..." : "확인"}
-                      </Button>
-                    </div>
+                <form onSubmit={handleVerifyCode}>
+                  <Label className="text-lg mb-1 block">인증코드</Label>
+                  <div className="flex gap-2">
+                    <Input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="6자리 코드 입력"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        className="!text-base min-h-10 py-2"
+                    />
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="shrink-0 text-lg p-5 min-h-10 cursor-pointer"
+                    >
+                      {loading ? "확인 중..." : "확인"}
+                    </Button>
                   </div>
+                </form>
               )}
 
               {error && <p className="text-base text-destructive">{error}</p>}
-            </form>
+            </div>
           )}
 
           {/* 2단계: 회원가입 (인증 완료 후) */}

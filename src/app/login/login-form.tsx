@@ -70,12 +70,19 @@ export default function LoginForm() {
             {loading ? "로그인 중..." : "로그인"}
           </Button>
         </form>
-        <p className="text-base text-center text-muted-foreground">
-          계정이 없으신가요?{" "}
-          <Link href="/signup" className="text-primary font-semibold hover:underline">
-            회원가입
-          </Link>
-        </p>
+        <div className="text-center space-y-2">
+          <p className="text-base text-muted-foreground">
+            <Link href="/reset-password" className="text-primary font-semibold hover:underline">
+              비밀번호를 잊으셨나요?
+            </Link>
+          </p>
+          <p className="text-base text-muted-foreground">
+            계정이 없으신가요?{" "}
+            <Link href="/signup" className="text-primary font-semibold hover:underline">
+              회원가입
+            </Link>
+          </p>
+        </div>
       </div>
     </main>
   );

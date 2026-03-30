@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
-  const { email, code } = await request.json();
+  const { email, code, purpose = "signup" } = await request.json();
 
   if (!email || !code) {
     return NextResponse.json({ error: "이메일과 인증코드를 입력해주세요." }, { status: 400 });
@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     .select("*")
     .eq("email", email)
     .eq("code", code)
+    .eq("purpose", purpose)
     .single();
 
   if (!record) {
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   if (new Date(record.expires_at) < new Date()) {
-    await supabase.from("email_verifications").delete().eq("email", email);
+    await supabase.from("email_verifications").delete().eq("email", email).eq("purpose", purpose);
     return NextResponse.json({ error: "인증코드가 만료되었습니다. 다시 발송해주세요." }, { status: 400 });
   }
 
@@ -28,7 +29,8 @@ export async function POST(request: Request) {
   await supabase
     .from("email_verifications")
     .update({ verified: true })
-    .eq("email", email);
+    .eq("email", email)
+    .eq("purpose", purpose);
 
   return NextResponse.json({ success: true });
 }
